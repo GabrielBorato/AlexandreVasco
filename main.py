@@ -26,7 +26,7 @@ service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service)
 
 # Acessar a página
-url = "https://www.mengo.com.br/ingressos"
+url = "https://vasco.eleventickets.com/#!/home"
 driver.get(url)
 logging.info(f"Acessando a página: {url}")
 
@@ -51,19 +51,65 @@ def enviar_email(assunto, mensagem):
         logging.error(f"Erro ao enviar e-mail: {e}")
 
 # Aguarde a página carregar
+time.sleep(10)
+# Aceitar cookies
+try:
+    wait = WebDriverWait(driver, 10)
+    botao_aceitar_cookies = wait.until(
+        EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'button-accept-cookie')]"))
+    )
+    botao_aceitar_cookies.click()
+    logging.info("Botão 'ACEITAR TODOS OS COOKIES' clicado com sucesso!")
+except Exception as e:
+    logging.error(f"Erro ao clicar no botão 'ACEITAR TODOS OS COOKIES': {e}")
+    print("Cookies aceito com sucesso")
 time.sleep(5)
 
 # Clicar no botão LOGIN
 try:
-    botao_login = driver.find_element(By.XPATH, "//button[contains(., 'LOGIN')]")
+    botao_login = driver.find_element(By.XPATH, "//a[@ng-click='login(true,null)']")
     botao_login.click()
     logging.info("Botão LOGIN clicado com sucesso!")
 except Exception as e:
     logging.error(f"Erro ao clicar no botão LOGIN: {e}")
-
+    print("Botão login clicado com sucesso")
 time.sleep(2)
+try:
+    # Aguardar a imagem estar visível e interagível
+    imagem_socio_torcedor = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//img[contains(@src, '64x64loginvasco.png')]"))
+    )
 
-# Funções para envio de teclas
+    # Rolando até a imagem para garantir visibilidade
+    driver.execute_script("arguments[0].scrollIntoView();", imagem_socio_torcedor)
+
+    # Clicando na imagem
+    imagem_socio_torcedor.click()
+
+    logging.info("Imagem do Sócio Torcedor clicada com sucesso!")
+    print("deuboa")
+except Exception as e:
+    logging.error(f"Erro ao clicar na imagem do Sócio Torcedor: {e}")
+    print("nãodeuboa")
+
+try:
+    # Aguardar o botão LOGIN estar visível e clicável
+    botao_login = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'LOGIN')]"))
+    )
+
+    # Rolando até o botão para garantir visibilidade
+    driver.execute_script("arguments[0].scrollIntoView();", botao_login)
+
+    # Clicando no botão LOGIN
+    botao_login.click()
+
+    logging.info("Botão LOGIN clicado com sucesso!")
+    print("deuboa: Botão LOGIN")
+except Exception as e:
+    logging.error(f"Erro ao clicar no botão LOGIN: {e}")
+    print("nãodeuboa: Botão LOGIN")
+
 def type_keys(text):
     actions = ActionChains(driver)
     actions.send_keys(text)
@@ -79,122 +125,22 @@ def bot_enter():
     actions.send_keys(Keys.ENTER)
     actions.perform()
 
-# Preenchendo o formulário de login
+# Solicitar e-mail e senha do usuário via input
+email_usuario = input("Digite seu e-mail: ")
+senha_usuario = input("Digite sua senha: ")
+
 try:
     time.sleep(3)
-    type_keys("alexandrermello@hotmail.com")
-    bot_tab()
-    type_keys("Leleca10@.!")
-    bot_tab()
-    time.sleep(3)
+    type_keys(email_usuario)  # Digita o e-mail informado pelo usuário
+    bot_tab()  # Passa para o próximo campo
+    type_keys(senha_usuario)  # Digita a senha informada pelo usuário
+    bot_tab()  # Passa para o próximo campo
     bot_enter()
-    logging.info("Credenciais inseridas com sucesso.")
+    time.sleep(3)
+
+    print("deuboa: E-mail e senha inseridos com sucesso!")
 except Exception as e:
-    logging.error(f"Erro ao preencher os campos de login: {e}")
-
-time.sleep(5)
-
-# Verificação de login bem-sucedido
-if "ingressos" in driver.current_url:
-    logging.info("Login realizado com sucesso!")
-else:
-    logging.warning("Falha no login!")
-
-time.sleep(10)
-
-# Clicar no botão "Maracanã"
-try:
-    estadio_button = driver.find_element(By.XPATH, "//p[text()='Maracanã']")
-    estadio_button.click()
-    logging.info("Botão 'Maracanã' clicado com sucesso!")
-except Exception as e:
-    logging.error(f"Erro ao clicar no botão 'Maracanã': {e}")
-
-time.sleep(10)
-
-# Clicar no botão "COMPRAR INGRESSO"
-try:
-    comprar_ingresso_button = driver.find_element(By.XPATH, "//button[contains(., 'COMPRAR INGRESSO')]")
-    comprar_ingresso_button.click()
-    logging.info("Botão 'COMPRAR INGRESSO' clicado com sucesso!")
-except Exception as e:
-    logging.error(f"Erro ao clicar no botão 'COMPRAR INGRESSO': {e}")
-
-time.sleep(15)
-
-# Mudar para nova aba
-abas = driver.window_handles
-driver.switch_to.window(abas[-1])
-logging.info("Mudou para a nova aba com sucesso!")
-
-time.sleep(10)
-
-# Aceitar cookies
-try:
-    wait = WebDriverWait(driver, 10)
-    botao_aceitar_cookies = wait.until(
-        EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'button-accept-cookie')]"))
-    )
-    botao_aceitar_cookies.click()
-    logging.info("Botão 'ACEITAR TODOS OS COOKIES' clicado com sucesso!")
-except Exception as e:
-    logging.error(f"Erro ao clicar no botão 'ACEITAR TODOS OS COOKIES': {e}")
-
-# Clicar no elemento ripple
-try:
-    wait = WebDriverWait(driver, 10)
-    elemento_ripple = wait.until(
-        EC.element_to_be_clickable((By.XPATH, "//span[@class='mdl-button__ripple-container']"))
-    )
-    elemento_ripple.click()
-    logging.info("Elemento clicado com sucesso!")
-except Exception as e:
-    logging.error(f"Erro ao clicar no elemento: {e}")
-
-ingressos_disponiveis = False
-primeira_tentativa = True
-
-while not ingressos_disponiveis:
-    try:
-        elementos_blocos = driver.find_elements(By.XPATH, "//*[starts-with(@class, 'bloco')]")
-        
-        if elementos_blocos:
-            for i in range(len(elementos_blocos)):
-                try:
-                    elementos_blocos = driver.find_elements(By.XPATH, "//*[starts-with(@class, 'bloco')]")
-                    elemento = elementos_blocos[i]
-                    elemento.click()
-                    time.sleep(2)
-                    logging.info(f"Clicou no bloco {i + 1}")
-
-                    try:
-                        div_preco = driver.find_element(By.XPATH, "//div[contains(@class, 'layout-row') and contains(@class, 'flex-order-4')]")
-                        span_preco = div_preco.find_element(By.TAG_NAME, "span")
-                        preco_texto = span_preco.text.strip()
-
-                        if preco_texto != "R$ 0.00":
-                            ingressos_disponiveis = True
-                            enviar_email("Ingressos Disponíveis!", f"Ingressos disponíveis no bloco {i + 1}! Preço: {preco_texto}")
-                            logging.info(f"Ingresso encontrado no bloco {i + 1}, parando a busca.")
-                            break
-                    except Exception as e:
-                        logging.error(f"Erro ao verificar preço: {e}")
-
-                    botoes_fechar = driver.find_elements(By.XPATH, "//md-icon[@md-svg-src='img/svg/clear5.svg']")
-                    if len(botoes_fechar) > 1:
-                        driver.execute_script("arguments[0].click();", botoes_fechar[1])
-                    time.sleep(3)
-                except Exception as e:
-                    logging.error(f"Erro ao interagir com o bloco {i + 1}: {e}")
-        
-        if primeira_tentativa:
-            primeira_tentativa = False
-            enviar_email("Ingressos Indisponíveis", "Ingressos indisponíveis na primeira tentativa, a busca continuará até encontrarmos disponibilidade.")
-            logging.info("E-mail de indisponibilidade enviado.")
-
-        time.sleep(10)
-    except Exception as e:
-        logging.error(f"Erro durante a busca: {e}")
-
+    print(f"nãodeuboa: Erro ao inserir os dados de login - {e}")
+time.sleep(50000)
 driver.quit()
 logging.info("Script finalizado, navegador fechado.")
