@@ -10,8 +10,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 
-caminho_chromedriver = r"C:\Users\gabriel.borato\Downloads\chromedriver-win64\chromedriver-win64\chromedriver.exe"
+caminho_chromedriver = ChromeDriverManager().install()
 
 service = Service(caminho_chromedriver)
 driver = webdriver.Chrome(service=service)
@@ -30,10 +32,12 @@ logging.info("Iniciando o script...")
 url = "https://ingressos.flamengo.com.br/"
 driver.get(url)
 logging.info(f"Acessando a página: {url}")
+
 def type_keys(text):
     actions = ActionChains(driver)
     actions.send_keys(text)
     actions.perform()
+
 def bot_tab():
     actions = ActionChains(driver)
     actions.send_keys(Keys.TAB)
@@ -46,19 +50,6 @@ def bot_enter():
     actions = ActionChains(driver)
     actions.send_keys(Keys.ENTER)
     actions.perform()
-
-def limpar_campo_email():
-    # Clicar no campo de e-mail
-    campo_login.click()
-    # Selecionar tudo (Ctrl + A)
-    actions = ActionChains(driver)
-    actions.send_keys(Keys.CONTROL + "a")  # Ctrl + A para selecionar tudo
-    actions.perform()
-    # Apagar tudo (Backspace)
-    actions.send_keys(Keys.BACKSPACE)
-    actions.perform()
-    logging.info("Campo de e-mail limpo com sucesso!")
-
 
 # Função para enviar e-mail
 def enviar_email(assunto, mensagem):
@@ -90,7 +81,7 @@ try:
     botao_concordo.click()
     print("✅ Botão 'Concordo' clicado com sucesso!")
 except Exception as e:
-    print(f"❌ Erro ao clicar no botão: {e}")
+    print(f"❌ Erro ao clicar no botão 'Concordo': {e}")
 
 time.sleep(5)
 try:
@@ -106,19 +97,16 @@ try:
     campo_login = wait.until(
         EC.visibility_of_element_located((By.ID, "login"))
     )
-    campo_login.send_keys("seu_email_ou_usuario_aqui")  # Substitua por um valor válido
     print("✅ Campo de login preenchido com sucesso!")
 except Exception as e:
     print(f"❌ Erro ao preencher o campo de login: {e}")
-
 
 # Solicitar e-mail e senha do usuário via input
 email_usuario = input("Digite seu e-mail: ")
 senha_usuario = input("Digite sua senha: ")
 
+# Digitar o e-mail e a senha
 try:
-    time.sleep(3)
-    limpar_campo_email()  # Limpa o campo de e-mail
     type_keys(email_usuario)  # Digita o e-mail informado pelo usuário
     bot_tab()  # Passa para o próximo campo
     type_keys(senha_usuario)  # Digita a senha informada pelo usuário
@@ -126,12 +114,58 @@ try:
     bot_tab()
     bot_enter()
     time.sleep(3)
-
-    print("deuboa: E-mail e senha inseridos com sucesso!")
+    print("✅ E-mail e senha inseridos com sucesso!")
 except Exception as e:
-    print(f"nãodeuboa: Erro ao inserir os dados de login - {e}")
+    print(f"❌ Erro ao inserir o e-mail e senha: {e}")
+
+# Aguardar até que o botão 'Comprar' esteja presente e clicar
+try:
+    botao_comprar = wait.until(
+        EC.element_to_be_clickable((By.XPATH, "//a[@data-event='18336']"))
+    )
+    # Clicar no botão
+    botao_comprar.click()
+    print("✅ Botão 'Comprar' clicado com sucesso!")
+except Exception as e:
+    print(f"❌ Erro ao clicar no botão 'Comprar': {e}")
+try:
+    preco_elemento = wait.until(
+        EC.element_to_be_clickable((By.ID, "price-7434013"))
+    )
+    preco_elemento.click()  # Clica no preço
+    print("✅ Preço clicado com sucesso!")
+except Exception as e:
+    print(f"❌ Erro ao clicar no preço: {e}")
+time.sleep(5)
+try:
+    for i in range(3):
+        botao_incrementar = wait.until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "btn-padrao-ativo.bootstrap-touchspin-up"))
+        )
+        botao_incrementar.click()  # Clica no botão '+'
+        print(f"✅ Clique {i + 1} no botão '+' realizado com sucesso!")
+except Exception as e:
+    print(f"❌ Erro ao clicar no botão '+': {e}")
+try:
+    botao_final_comprar = wait.until(
+        EC.element_to_be_clickable((By.CLASS_NAME, "btn.fc-btn"))
+    )
+    botao_final_comprar.click()  # Clica no botão "Comprar"
+    print("✅ Botão 'Comprar' final clicado com sucesso!")
+except Exception as e:
+    print(f"❌ Erro ao clicar no botão 'Comprar' final: {e}")
+time.sleep(5)
+try:
+    # Espera o botão 'OK' dentro da div com o id 'alert-cancel' estar visível e clicável
+    botao_ok = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[@id='alert-cancel']"))
+    )
+    botao_ok.click()  # Clica no botão "OK"
+    print("✅ Botão 'OK' clicado com sucesso!")
+    
+except Exception as e:
+    print(f"❌ Erro ao clicar no botão 'OK': {e}")
 
 time.sleep(50000)
 driver.quit()
 logging.info("Script finalizado, navegador fechado.")
-
