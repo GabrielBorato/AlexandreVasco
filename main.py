@@ -141,6 +141,15 @@ try:
     print("deuboa: E-mail e senha inseridos com sucesso!")
 except Exception as e:
     print(f"nãodeuboa: Erro ao inserir os dados de login - {e}")
+
+try:
+    elemento_jogo = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//div[@routerlink='/ingressos']//span[contains(text(), '8')]"))
+    )
+    elemento_jogo.click()
+    logging.info("Clicou na data '8 abr.' com sucesso.")
+except Exception as e:
+    logging.error(f"Erro ao clicar na data: {e}")
 time.sleep(50000)
 driver.quit()
 logging.info("Script finalizado, navegador fechado.")
