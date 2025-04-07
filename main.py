@@ -29,7 +29,7 @@ logging.basicConfig(
 logging.info("Iniciando o script...")
 
 # Acessar a página
-url = "https://ingressos.flamengo.com.br/"
+url = "https://vasco.eleventickets.com/#!/home"
 driver.get(url)
 logging.info(f"Acessando a página: {url}")
 
@@ -75,31 +75,36 @@ time.sleep(10)
 # Aceitar cookies
 try:
     wait = WebDriverWait(driver, 10)
-    botao_concordo = wait.until(
-        EC.element_to_be_clickable((By.ID, "setCookies"))
+    botao_aceitar_cookies = wait.until(
+        EC.element_to_be_clickable((By.ID, "textBtn"))
     )
-    botao_concordo.click()
-    print("✅ Botão 'Concordo' clicado com sucesso!")
+    botao_aceitar_cookies.click()
+    print("✅ Botão 'ACEITAR TODOS OS COOKIES' clicado com sucesso!")
 except Exception as e:
-    print(f"❌ Erro ao clicar no botão 'Concordo': {e}")
+    print(f"❌ Erro ao clicar no botão 'ACEITAR TODOS OS COOKIES': {e}")
 
-time.sleep(5)
+time.sleep(3)
 try:
-    login_element = wait.until(
-        EC.element_to_be_clickable((By.XPATH, "//small[text()='Login']"))
+    wait = WebDriverWait(driver, 10)
+    icone_perfil = wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, "md-icon[md-svg-src='img/svg/round58.svg']"))
     )
-    login_element.click()
-    print("✅ Elemento 'Login' clicado com sucesso!")
+    icone_perfil.click()
+    print("✅ Ícone de perfil clicado com sucesso!")
 except Exception as e:
-    print(f"❌ Erro ao clicar no elemento 'Login': {e}")
-
+    print(f"❌ Erro ao clicar no ícone de perfil: {e}")
 try:
-    campo_login = wait.until(
-        EC.visibility_of_element_located((By.ID, "login"))
+    wait = WebDriverWait(driver, 10)
+    publico_geral_btn = wait.until(
+        EC.element_to_be_clickable((
+            By.XPATH,
+            "//a[@style='background-color: rgb(0, 0, 0);']//p[text()='Público Geral - Jogos']"
+        ))
     )
-    print("✅ Campo de login preenchido com sucesso!")
+    publico_geral_btn.click()
+    print("✅ Botão 'Público Geral - Jogos' clicado com sucesso!")
 except Exception as e:
-    print(f"❌ Erro ao preencher o campo de login: {e}")
+    print(f"❌ Erro ao clicar no botão 'Público Geral - Jogos': {e}")
 
 # Solicitar e-mail e senha do usuário via input
 email_usuario = input("Digite seu e-mail: ")
@@ -118,53 +123,7 @@ try:
 except Exception as e:
     print(f"❌ Erro ao inserir o e-mail e senha: {e}")
 
-# Aguardar até que o botão 'Comprar' esteja presente e clicar
-try:
-    botao_comprar = wait.until(
-        EC.element_to_be_clickable((By.XPATH, "//a[@data-event='18336']"))
-    )
-    # Clicar no botão
-    botao_comprar.click()
-    print("✅ Botão 'Comprar' clicado com sucesso!")
-except Exception as e:
-    print(f"❌ Erro ao clicar no botão 'Comprar': {e}")
-try:
-    preco_elemento = wait.until(
-        EC.element_to_be_clickable((By.ID, "price-7434013"))
-    )
-    preco_elemento.click()  # Clica no preço
-    print("✅ Preço clicado com sucesso!")
-except Exception as e:
-    print(f"❌ Erro ao clicar no preço: {e}")
-time.sleep(5)
-try:
-    for i in range(3):
-        botao_incrementar = wait.until(
-            EC.element_to_be_clickable((By.CLASS_NAME, "btn-padrao-ativo.bootstrap-touchspin-up"))
-        )
-        botao_incrementar.click()  # Clica no botão '+'
-        print(f"✅ Clique {i + 1} no botão '+' realizado com sucesso!")
-except Exception as e:
-    print(f"❌ Erro ao clicar no botão '+': {e}")
-try:
-    botao_final_comprar = wait.until(
-        EC.element_to_be_clickable((By.CLASS_NAME, "btn.fc-btn"))
-    )
-    botao_final_comprar.click()  # Clica no botão "Comprar"
-    print("✅ Botão 'Comprar' final clicado com sucesso!")
-except Exception as e:
-    print(f"❌ Erro ao clicar no botão 'Comprar' final: {e}")
-time.sleep(5)
-try:
-    # Espera o botão 'OK' dentro da div com o id 'alert-cancel' estar visível e clicável
-    botao_ok = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//button[@id='alert-cancel']"))
-    )
-    botao_ok.click()  # Clica no botão "OK"
-    print("✅ Botão 'OK' clicado com sucesso!")
-    
-except Exception as e:
-    print(f"nãodeuboa: Erro ao inserir os dados de login - {e}")
+
 time.sleep(50000)
 driver.quit()
 logging.info("Script finalizado, navegador fechado.")
