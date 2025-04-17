@@ -13,7 +13,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 def enviar_telegram(mensagem):
     token = '7935676935:AAEkJJW3gNXrQkbc9z6C9ztcwDMP0-g7XNU'
-    chat_ids = [6675236455]  # 6675236455  483107010
+    chat_ids = [483107010]  # 6675236455  
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     for chat_id in chat_ids:
         payload = {
